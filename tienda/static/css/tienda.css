@@ -1,0 +1,441 @@
+body{
+  font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+
+}
+.page_header{
+    height: 150px;
+    box-shadow: 4px 5px 5px 5px black;
+    margin-bottom: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(2,0,36,1) 2%, rgba(53,184,153,1) 31%, rgba(71,251,195,1) 35%, rgba(0,212,255,1) 100%);
+    margin-top: 30px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap-reverse;
+    justify-content: space-between;
+    align-items: flex-end;
+    align-content: flex-end;
+}
+
+.mensajeausuario{
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  font-size: 30px;
+  margin-top: 100px;
+  margin-right: auto;
+}
+
+
+h1{
+    font-size: 80px;
+    margin-left: 10px;
+}
+
+.enlace_base{
+    text-decoration: none;
+    color: white;
+}
+
+.enlace_base:hover{
+    color: #d46767;
+}
+
+
+
+
+/* CSS */
+.button-30 {
+  align-items: center;
+  appearance: none;
+  background-color: #FCFCFD;
+  border-radius: 4px;
+  border-width: 0;
+  box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px,rgba(45, 35, 66, 0.3) 0 7px 13px -3px,#D6D6E7 0 -3px 0 inset;
+  box-sizing: border-box;
+  color: #36395A;
+  cursor: pointer;
+  font-family: "JetBrains Mono",monospace;
+  height: 48px;
+  justify-content: center;
+  line-height: 1;
+  list-style: none;
+  overflow: hidden;
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+  text-decoration: none;
+  transition: box-shadow .15s,transform .15s;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  white-space: nowrap;
+  will-change: box-shadow,transform;
+  font-size: 18px;
+
+}
+
+.button-30:focus {
+  box-shadow: #D6D6E7 0 0 0 1.5px inset, rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+}
+
+.button-30:hover {
+  box-shadow: rgba(45, 35, 66, 0.4) 0 4px 8px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
+  transform: translateY(-2px);
+}
+
+.button-30:active {
+  box-shadow: #D6D6E7 0 3px 7px inset;
+  transform: translateY(2px);
+}
+
+/* CSS */
+.button-86 {
+  all: unset;
+  width: 100px;
+  height: 30px;
+  font-size: 16px;
+  background: transparent;
+  border: none;
+  position: relative;
+  color: #f0f0f0;
+  cursor: pointer;
+  z-index: 1;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  align-self: flex-end;
+  margin-top: 40px;
+  margin-right: 100px;
+}
+
+.button-86::after,
+.button-86::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: -99999;
+  transition: all .4s;
+}
+
+.button-86::before {
+  transform: translate(0%, 0%);
+  width: 100%;
+  height: 100%;
+  background: #28282d;
+  border-radius: 10px;
+}
+
+.button-86::after {
+  transform: translate(10px, 10px);
+  width: 35px;
+  height: 35px;
+  background: #ffffff15;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border-radius: 50px;
+}
+
+.button-86:hover::before {
+  transform: translate(5%, 20%);
+  width: 110%;
+  height: 110%;
+}
+
+.button-86:hover::after {
+  border-radius: 10px;
+  transform: translate(0, 0);
+  width: 100%;
+  height: 100%;
+}
+
+.button-86:active::after {
+  transition: 0s;
+  transform: translate(0, 5%);
+}
+
+
+
+.myButton {
+	box-shadow:inset 0px -3px 7px 0px #29bbff;
+	background:linear-gradient(to bottom, #2dabf9 5%, #0688fa 100%);
+	background-color:#2dabf9;
+	border-radius:3px;
+	border:1px solid #0b0e07;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:15px;
+	padding:9px 23px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #263666;
+}
+.myButton:hover {
+	background:linear-gradient(to bottom, #0688fa 5%, #2dabf9 100%);
+	background-color:#0688fa;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+
+/*-----------------index--------------*/
+
+.titulo_tienda{
+  font-size: 50px;
+  font-weight: bold;
+  text-decoration:dashed;
+}
+
+.titulo_tienda:hover{
+  transition: 3s;
+  font-size: 70px;
+  font-weight: bold;
+
+}
+
+.texto_entrada_enlaces{
+  text-decoration: none;
+  color:#1b1b1b;
+  font-size: 30px;
+}
+
+/*----iniciarsesion-----*/
+
+.texto_iniciarSesion{
+  margin-top: 10px;
+  padding: 5px;
+  text-align: left;
+  font-size: 20px;
+  width: 400px;
+  margin-left: 150px;
+
+}
+
+.recuadro_iniciarSesion{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 40%;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
+}
+
+/*------producto--------*/
+
+.tablaOrden{
+  text-align: center;
+  align-items: center;
+  border-collapse: collapse;
+  width:100%;
+  height:20%;
+  box-shadow: 4px 2px 2px black;
+}
+
+.colorTrEntrada{
+  background-color: #d46767;
+}
+
+.colorTr{
+  background-color: rgb(255, 255, 255);
+}
+
+
+.texto{
+  margin-top: 30px;
+  padding: 5px;
+  text-align: center;
+  font-size: 30px;
+}
+
+
+/*--------Editar----------*/
+
+.recuadro_editar{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 600px;
+  width: 500px;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 700px;
+
+}
+
+.texto_edicion{
+  margin-top: 30px;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+}
+
+
+
+/*----Tienda-----*/
+.orden_recuadros{
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
+}
+
+
+.recuadro_productos{
+    border: 1px solid;
+    border-radius: 10px;
+    box-shadow: 4px 2px 2px black;
+    height: 500px;
+    width: 350px;
+    padding: 20px;
+    margin-top: 20px;
+    margin-right: 30px;
+
+}
+
+.recuadro_imagenes{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    width: auto;
+    height: 300px;
+}
+
+.recuadro_imagenes img{
+        width: 100%;
+        height: auto;
+         object-fit: cover;
+            border-bottom: 1px solid #1b1b1b;
+
+}
+
+.ordenFlex{
+display: flex;
+flex-direction: row;
+
+}
+
+.texto_tienda_nombre{
+      margin-top: 30px;
+      text-align: left;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+
+.texto_tienda_precio{
+      margin-top: 5px;
+      text-align: left;
+      font-size: 40px;
+      color: #d46767;
+    }
+
+.texto_boton{
+  margin-top: 5px;
+  margin-left: 60px;
+}
+
+.texto_tienda_enlaces{
+  text-decoration: none;
+  color:#1b1b1b;
+  font-size: 20px;
+}
+
+/*----comprar------*/
+
+.recuadro_compra{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 630px;
+  width: 50%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 470px;
+  display: flex;
+  flex-direction: row;
+
+}
+
+.texto_compra{
+  display: flex;
+  flex-direction: row;
+  margin-top: 40px;
+  margin-left: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 30px;
+  position: relative;
+}
+
+
+.colorRojo{
+  color: rgb(223, 130, 69,51);
+  font-weight: bold;
+  margin-left: 20px;
+ }
+
+.imagen_colocar{
+  width: auto;
+  height: 300px;
+  margin-right: 100px;
+  margin-top: 150px;
+  margin-left: 50px;
+  position: relative;
+
+}
+
+.imagen_colocar img{
+      width: 90%;
+      height: auto;
+       object-fit: cover;
+
+}
+
+/*----Compra terminada------*/
+
+.recuadro_compraFin{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 500px;
+  width: 500px;
+  padding: 20px;
+  margin-top: 20px;
+
+}
+
+.texto_compra_Fin{
+  display: flex;
+  flex-direction: column;
+  margin-top: 30px;
+  padding: 5px;
+  text-align: left;
+
+}
+
+.fechaCompra{
+  font-size: 30px;
+}
+
+.texto_compra_fin{
+  font-weight: bold;
+  font-size: 35px;
+}
+
+/*----info-----*/
+.checkbox-container {
+  font-size: 25px;
+}

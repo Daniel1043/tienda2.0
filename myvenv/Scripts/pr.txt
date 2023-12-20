@@ -1,0 +1,74 @@
+CREATE OR REPLACE TRIGGER triger1 AFTER
+ INSERT ON lpedido
+ FOR EACH ROW
+ BEGIN
+     IF UPDATING THEN
+      UPDATE pedido
+      SET total_pedido=:NEW.unidades * (:NEW.precio - :NEW.precio * :NEW.dto);
+     END IF;
+ 
+END triger1;
+
+
+DECLARE
+  fecha_facturacion DATE;
+  tiempo_transcurrido NUMBER;
+BEGIN
+  -- Obtener la fecha de facturación del albarán número 10
+  SELECT factura.fecha INTO fecha_facturacion
+  FROM albaran INNER JOIN factura USING(cliente) WHERE nalbaran = 10;
+ 
+
+  IF fecha_facturacion IS NOT NULL THEN
+   
+    tiempo_transcurrido := TRUNC(SYSDATE - fecha_facturacion);
+
+    DBMS_OUTPUT.PUT_LINE('El albarán número 10 está facturado.');
+    DBMS_OUTPUT.PUT_LINE('Han pasado ' || tiempo_transcurrido || ' días desde la facturación.');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('El albarán número 10 no está facturado.');
+  END IF;
+END;
+
+
+
+DECLARE
+
+FUNCTION ventas_cliente(cli VARCHAR2) RETURN NUMBER AS
+    tot_ventas  pedido.total_pedido%TYPE:=0;
+    BEGIN
+        SELECT SUM (total_pedido) INTO tot_ventas FROM pedido
+        INNER JOIN cliente ON cliente = nif
+        WHERE cliente= cli;
+        
+        IF tot_ventas IS NULL OR SQL%NOTFOUND THEN 
+            DBMS_OUTPUT.PUT_LINE('No se encuentran pedidos del cliente '||cli);
+            tot_ventas:=0;
+        END IF;
+    
+        RETURN tot_ventas;
+END ventas_cliente;
+        
+PROCEDURE actualiza_ventas(nifcli VARCHAR2) IS
+
+    ventas_tcli  cliente.ventas%TYPE:=0;
+    
+    BEGIN
+		ventas_tcli:=ventas_cliente(nifcli);
+    
+		UPDATE cliente SET ventas = ventas_tcli
+		WHERE nif = nifcli;
+		
+    IF SQL%FOUND THEN 
+        DBMS_OUTPUT.PUT_LINE('Se ha actualizado las ventas de ' || nifcli ||' al valor:'||TO_CHAR(ventas_tcli,'fm99999990.00'));
+    END IF;
+
+    EXCEPTION
+    WHEN NO_DATA_FOUND  THEN
+        DBMS_OUTPUT.PUT_LINE('No se ha encontrado el cliente');
+END actualiza_ventas;
+
+BEGIN
+    actualiza_ventas('30000001A');
+    actualiza_ventas('30000017A');
+END;
