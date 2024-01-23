@@ -1,0 +1,30 @@
+{% extends 'tienda/base.html' %}
+            		
+{% block content %}
+
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if direccion %}
+            <center> <h1>Eliminar dirección</h1> </center> 
+            <div class="recuadro_editar">
+                <div class="texto_edicion">Envío: {{ direccion.envio }}</div>
+                <div class="texto_edicion">Facturación: {{ direccion.facturacion }}</div>
+                <br>
+                <center> <button type="submit" class="button-30">Eliminar dirección</button> </center>
+            </div>
+        {% else %}
+            <center> <h1>Eliminar tarjeta</h1> </center> 
+            <div class="recuadro_editar">
+                <div class="texto_edicion">Nombre: {{ tarjeta.nombre_ID }}</div>
+                <div class="texto_edicion">Tipo: {{ tarjeta.tipo }}</div>
+                <div class="texto_edicion">Titular: {{ tarjeta.titular }}</div>
+                <div class="texto_edicion">Caducidad: {{ tarjeta.Caducidad }}</div>
+                <br>
+                <center> <button type="submit" class="button-30">Eliminar tarjeta</button> </center>
+            </div>
+        {% endif %}
+    </form>
+    
+{% endblock %}

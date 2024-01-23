@@ -1,0 +1,25 @@
+{% extends 'tienda/base.html' %}
+            		
+{% block content %}
+
+    <center> <h1>Editar Producto</h1> </center>
+    <div class="recuadro_editar">
+
+    <form method="post" >
+        {% csrf_token %}
+        <div class="texto_edicion">Usuario:  {{ comentario.user }}</div>
+        <div class="texto_edicion">Producto:  {{ comentario.producto }}</div>
+
+        <div class="texto_edicion">Comentario:  {{ comentario.texto }}</div>
+
+
+
+        <br>
+        <center> <button type="submit" class="button-30">Eliminar comentario </button></center>
+
+
+
+    </form>
+    </div>
+    
+{% endblock %}

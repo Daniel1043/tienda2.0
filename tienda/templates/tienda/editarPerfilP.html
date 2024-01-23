@@ -1,0 +1,26 @@
+{% extends 'tienda/base.html' %}
+            		
+{% block content %}
+
+    <center> <h1>Editar Cliente</h1> </center>
+    <div class="recuadro_datosEditarCliente">
+
+    <form method="post">
+        {% csrf_token %}
+        <center>
+        <div class="texto_datosClienteEditar"> {{ formUsuario.as_div }} </div>
+
+         <div class="texto_datosClienteEditar">Apellido: {{ formE.apellidos }}</div>
+
+            <div class="texto_datosClienteEditar">Saldo: {{ formE.saldo }}</div>
+
+
+
+
+        <br>
+         </center>
+        <center> <button type="submit" class="button-30">Guardar Cambios</button> </center>
+    </form>
+    </div>
+    
+{% endblock %}

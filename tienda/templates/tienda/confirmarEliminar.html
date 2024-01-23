@@ -5,7 +5,7 @@
     <center> <h1>Editar Producto</h1> </center>
     <div class="recuadro_editar">
 
-    <form method="post">
+    <form method="post" >
         {% csrf_token %}
         <div class="texto_edicion">Nombre: {{producto.nombre}}</div>
         <div class="texto_edicion">Marca: {{producto.marca}}</div>
@@ -13,8 +13,12 @@
         <div class="texto_edicion"> Precio: {{producto.precio}}€</div>
         <div class="texto_edicion"> Unidade: {{producto.unidades}}</div>
         <div class="texto_edicion"> Vip: {{producto.vip}}</div>
+
+
         <br>
-        <center> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarProducto' pk=producto.pk %}">Eliminar producto</a> </button></center>
+        <center> <button type="submit" class="button-30">Eliminar producto </button></center>
+
+
 
     </form>
     </div>

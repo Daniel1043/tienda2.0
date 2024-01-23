@@ -1,0 +1,22 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+    <center> <h1>Editar Producto</h1> </center>
+    <div class="recuadro_editar">
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="texto_edicion">Usuario: {{comentario.user}}</div>
+        <div class="texto_edicion">Producto: {{comentario.producto}}</div>
+          <div class="form-group">
+            <label for="id_texto">Nuevo Comentario:</label>
+            <textarea id="id_texto" name="texto" class="form-control">{{comentario.texto}}</textarea>
+        </div>
+
+        <br>
+        <center> <button type="submit" class="button-30">Guardar Cambios</button> </center>
+    </form>
+    </div>
+
+{% endblock %}

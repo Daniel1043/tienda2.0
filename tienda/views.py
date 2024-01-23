@@ -1,137 +1,29 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.views import LogoutView, LoginView
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Producto, Cliente, Compra, Marca
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django_filters.views import FilterView
+
+from .filters import ProductoXmarcaFilter
+from .models import Producto, Cliente, Compra, Comentario, Direccion, Tarjeta
 from django.contrib.admin.views.decorators import staff_member_required
-from .form import cambiarProducto, iniciar_sesion, fitroForm, comprasForm
+from .form import cambiarProducto, iniciar_sesion, fitroForm, comprasForm,crearUsuario,crearUsuarioDatos, \
+    ValorarProductoForm, formComentarios,crearDireccionForm,crearTarjetaForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.db import transaction
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Avg
+from django.views import View
+from django.views.generic import TemplateView, CreateView, ListView, UpdateView, DeleteView, DetailView
 
 
 # Esto enlazara con la pagina de inicio
-def welcome(request):
-    return render(request, 'tienda/index.html', {})
-
-
-# --------------------------------------------------------------------------------------------------
-
-# Iniciaremos sesión
-def loge_ins(request):
-    form = iniciar_sesion()
-    template = 'tienda/iniciarSesion.html'
-    return_render = render(request, template, {'form': form})
-
-    if request.method == "POST":
-
-        form = iniciar_sesion(request, data=request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get("username")
-            password = form.cleaned_data.get("password")
-            next_ruta = request.GET.get('next')
-
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                cliente = cliente_check(user)
-
-                if cliente:
-                    login(request, user)
-                    return_render = redirect(next_ruta)
-                    return return_render
-                else:
-                    return return_render
-        else:
-            return return_render
-    else:
-        return return_render
-
-
-def cerrar_sesion_view(request):
-    logout(request)
-    return redirect('welcome')
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-# Pasara todos los productos que ya existen en producto
-@login_required(login_url='loge_ins')  # Obligara a que para entrar el usuario deba estar logeado
-@staff_member_required  # Obligara a que el usuario sea un miembro del suff o admin
-def productos(request):
-    Productos = Producto.objects.all()  # Coge todos los objetos que hay en productos
-    return render(request, 'tienda/producto.html', {'Productos': Productos})
-
-
-# Permitira editar los productos ya existentes
-@staff_member_required
-def editarProducto(request, pk):
-    producto = get_object_or_404(Producto,
-                                 pk=pk)  # Recupera los objetos de la clase producto ,el pk=pk se utilizara para buscar el objeto Producto que tenga la clave primaria que coincida con el valor de pk.
-    if request.method == "POST":
-        form = cambiarProducto(request.POST,
-                               instance=producto)  # Inicializaremos un formulario con datos ya creados, al trabajar con formularios para editar datos existentes, se utiliza el argumento instance, instance=producto asigna un objeto ya creado al formulario.
-        if form.is_valid():
-            producto = form.save(
-                commit=False)  # Generará una instancia del modelo producto con los datos del formulario. Cuando se pasa el argumento commit=False, se le indica a Django que no guarde inmediatamente los datos en la base de datos, sino que simplemente cree una instancia del modelo
-            producto.save()  # Guardaremos los cambios realizados en la base de datos
-            return redirect('productos')  # Nos redigirá a los productos
-    else:  # Si la solicitud no es de tipo POST,   se inicializa el formulario con el objeto producto como instancia del formulario. Esto asegura que el formulario muestre los datos actuales del producto para su edición.
-        form = cambiarProducto(instance=producto)
-    return render(request, 'tienda/editar.html', {'form': form})  # Se renderiza y se envia el formulario
-
-
-@staff_member_required
-def paginaConfirmacionEliminar(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    return render(request, 'tienda/confirmarEliminar.html', {'producto': producto})
-
-
-# Eliminará los productos ya existentes
-@staff_member_required
-def eliminarProducto(request, pk):
-    producto = Producto.objects.filter(
-        pk=pk).delete()  # Busca un objeto en la base de datos de la clase Producto donde la clave primaria (pk) es igual al valor proporcionado(La función filter() se utiliza para filtrar los objetos en función de ciertos criterios, y en este caso, se filtra por la clave primaria), y luego lo borra de la base de datos
-    return redirect('productos')
-
-
-# Añadira un nuevo producto
-@staff_member_required
-def añadirProducto(request):
-    if request.method == "POST":
-        form = cambiarProducto(request.POST)  # Inicializaremos un formulario con los datos enviados por el usuario
-        if form.is_valid():
-            form.save()  # Guardaremos los datos introducidos en la base de datos
-            return redirect('productos')
-    else:  # Si la solicitud no es de tipo POST , inicializamos un formulario vacío para mostrar al usuario
-        form = cambiarProducto()
-    return render(request, 'tienda/nuevo.html', {'form': form})
-
-
-# --------------------------------------------------------------------------------------------------
-
-
-# Enlazara con la pagina tienda y mostrara una lista de los productos que ya existen
-def tienda(request):
-    productos = Producto.objects.all()  # Recuperara los objetos de la calse productos de la base de datos de producto en models
-    filtro_prod = fitroForm()  # Cogeremos el filtro de form para poder buscar por nombre y marca
-
-    if request.method == "POST":  # Comprueba si la solicitud que está llegando al servidor es de tipo POST.
-        filtro_prod = fitroForm(
-            request.POST)  # Se inicializa el formulario fitroForm con los datos enviados mediante request.POST.
-        if filtro_prod.is_valid():  # Validaremos si los datos introducidos son correctos
-            nombre = filtro_prod.cleaned_data['nombre']  # Cogeremos el nombre pasado
-            marca = filtro_prod.cleaned_data['marca']
-
-            productos = productos.filter(
-                nombre__contains=nombre)  # Filtraremos los productos por ese nombre, para solo mostrar los productos que contengan similitudes con el nombre
-            if marca:
-                productos = productos.filter(marca__id__in=marca)
-
-    return render(request, 'tienda/tienda.html', {'Productos': productos,
-                                                  'filtro_prod': filtro_prod})  # Pasaremos los datos, todos los datos que hay en producto y el filtro para buscar los nombres de cada producto
+class AboutView(TemplateView):
+    template_name = "tienda/index.html"
 
 
 # Utilizaremos esto para verificar si el usuario es o no un cliente
@@ -139,89 +31,601 @@ def cliente_check(user):
     return Cliente.objects.filter(user=user).exists()
 
 
-@transaction.atomic  # Es un decorador que se utiliza para garantizar que un bloque de código se ejecute en una transacción de base de datos atómica.
-def comprarProducto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == "POST":
-        form = comprasForm(request.POST)
-        if form.is_valid():
-            unidades = form.cleaned_data['unidades']
-
-            if unidades <= producto.unidades:
-                cliente = Cliente.objects.get(user=request.user)
-                producto.unidades -= unidades
-                producto.save()
-                compra = Compra()
-                compra.producto = producto
-                compra.user = cliente
-                compra.unidades = unidades
-                compra.importe = unidades * producto.precio
-                compra.fecha = timezone.now()
-                compra.save()
-                cliente.saldo -= compra.importe
-                cliente.save()
-                messages.info(request, "Compra finalizada")
-                return redirect('checkout', pk=compra.pk)
-            else:
-                messages.error(request, "No hay suficientes unidades disponibles para esta compra")
-    form = comprasForm()
-    return render(request, 'tienda/compraProducto.html', {'form': form, 'producto': producto})
-
-
-# Nos mostrara el total gastado en la compra y los datos de ella
-@login_required(login_url='loge_ins')
-@user_passes_test(cliente_check, login_url='loge_ins')
-def checkout(request, pk):
-    compra = Compra.objects.get(pk=pk)
-    producto = compra.producto
-    importe = compra.unidades * producto.precio
-    return render(request, 'tienda/checkout.html', {'producto': producto, 'compra': compra, 'importe': importe})
+# Comprobara que es un moderador
+def es_moderador(user):
+    return user.groups.filter(name='Moderadores').exists()
 
 
 # --------------------------------------------------------------------------------------------------
 
 
-# En info mostraremos todos los productos, podremos buscarlos y marcalos según su marca y nombre, es igual al anterior view de tienda
+# Iniciaremos sesión
+class LogIn(LoginView):
+    template_name = 'tienda/iniciarSesion.html'
 
-@login_required(login_url='loge_ins')
-@staff_member_required
-def info(request):
-    productos = Producto.objects.all()
-    marcas = Marca.objects.all()
-    filtro_prod = fitroForm()
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        next_url = self.get_success_url()
+        if not next_url:
+            next_url = 'tienda/'
 
-    if request.method == "POST":
-        filtro_prod = fitroForm(request.POST)
-        if filtro_prod.is_valid():
-            nombre = filtro_prod.cleaned_data['nombre']
-            marca = filtro_prod.cleaned_data['marca']
+        return redirect(next_url)
 
-            productos = productos.filter(nombre__contains=nombre)
-            if marca:
-                productos = productos.filter(marca__id__in=marca)
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        return response
 
-    return render(request, 'tienda/info.html', {'Productos': productos, 'filtro_prod': filtro_prod, 'marcas': marcas})
+
+class LogoutViewCl(LogoutView):
+    def dispatch(self, request):
+        logout(self.request)
+        return redirect(reverse_lazy('welcome'))
+
+
+#-------------------------------------------------------------------------------------------
+
+
+class crearCliente(CreateView):
+    template_name = 'tienda/crearUsuario.html'
+    form_class = crearUsuario
+    success_url = reverse_lazy('welcome')
+
+    def form_valid(self, form):
+        datos_form = crearUsuarioDatos(self.request.POST)
+
+        if datos_form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+
+            datos_cliente = datos_form.cleaned_data
+
+            # Crear el cliente con los datos recolectados
+            cliente = Cliente(user=user, vip=False, **datos_cliente)
+            cliente.save()
+
+            login(self.request, user)
+            return redirect(self.success_url)
+        else:
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['datos_form'] = crearUsuarioDatos()
+        return context
+
+
+class infoClienteDetail(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Cliente
+    template_name = 'tienda/datosCliente.html'
+    context_object_name = 'cliente_actual'
+
+    def test_func(self):
+        # Verifica si el usuario actual es un cliente
+        return cliente_check(self.request.user)
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Cliente, user=self.request.user)
+
+
+class clientenUpdateview(UpdateView):
+    template_name = 'tienda/editarPerfilP.html'
+    model = Cliente
+    form_class = crearUsuarioDatos
+    second_form_class = crearUsuario
+    success_url = reverse_lazy('welcome')
+
+    def get_object(self, queryset=None):
+        # Obtener el objeto Cliente asociado al usuario actual
+        return Cliente.objects.get(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Agregamos los dos formularios al contexto con nombres diferentes
+        context['formE'] = self.form_class(instance=self.object)
+        context['formUsuario'] = self.second_form_class(instance=self.object.user)
+        return context
+
+    def form_valid(self, form):
+        # Guardar el formulario principal (crearUsuarioDatos)
+        response = super().form_valid(form)
+        # Guardar el segundo formulario (crearUsuario)
+        form2 = self.second_form_class(self.request.POST, instance=self.object.user)
+        if form2.is_valid():
+            form2.save()
+        return response
+
+
+# --------------------------------------------------------------------------
+
+class tarjetasListview(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Tarjeta
+    template_name = 'tienda/direccionCliente.html'
+    context_object_name = 'datos_cliente_tarjeta'
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get_queryset(self):
+        cliente_actual = Cliente.objects.get(user=self.request.user)
+
+        return Tarjeta.objects.filter(user=cliente_actual).all()
+
+
+class tarjetaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/añadir/añadirDr.html'
+    form_class = crearTarjetaForm
+    success_url = reverse_lazy('datosTarjeta')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user.cliente
+        return super().form_valid(form)
+
+
+class tarjetaUpdateview(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/actualizar/editarDR.html'
+    model = Tarjeta
+    form_class = crearTarjetaForm
+    success_url = reverse_lazy('datosTarjeta')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Tarjeta, pk=pk)
+
+
+class tarjetaDeleteview(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/eliminar/eliminarDR.html'
+    model = Tarjeta
+    success_url = reverse_lazy('datosTarjeta')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return redirect(self.success_url)
+
+
+# ---------------------------------------------------------------------------------------
+
+
+class direccionesListview(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Direccion
+    template_name = 'tienda/direccionCliente.html'
+    context_object_name = 'datos_cliente'
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get_queryset(self):
+        cliente_actual = Cliente.objects.get(user=self.request.user)
+        return Direccion.objects.filter(user=cliente_actual).all()
+
+
+class direccionCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/añadir/añadirDr.html'
+    form_class = crearDireccionForm
+    success_url = reverse_lazy('datosDireccion')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user.cliente
+        return super().form_valid(form)
+
+
+class direccionUpdateview(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/actualizar/editarDR.html'
+    model = Direccion
+    form_class = crearDireccionForm
+    success_url = reverse_lazy('datosDireccion')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Direccion, pk=pk)
+
+
+class direccionDeleteview(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/eliminar/eliminarDR.html'
+    model = Direccion
+    success_url = reverse_lazy('datosDireccion')
+
+    def test_func(self):
+        return cliente_check(self.request.user)
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return redirect(self.success_url)
+
+
+# ------------------------------------------------------------
+
+class historiaCompraClienteListview(ListView):
+    model = Compra
+    template_name = 'tienda/direccionCliente.html'
+    context_object_name = 'comprasActualCliente'
+
+    def get_queryset(self):
+        cliente_actual = self.request.user.cliente
+
+        return Compra.objects.filter(user=cliente_actual).order_by('-fecha')
+
+
+# --------------------------------------------------------------------------------------------------
+
+    # Pasara todos los productos que ya existen en producto
+class ProductListView(LoginRequiredMixin,UserPassesTestMixin,ListView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Producto
+    template_name = 'tienda/producto.html'
+    context_object_name = 'Productos'
+
+    def test_func(self):
+        # Verifica si el usuario actual es miembro del staff
+        return self.request.user.is_staff
+    def get_queryset(self):
+        return Producto.objects.all()
+
+
+
+
+# Permitira editar los productos ya existentes
+class EditarProductoView(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Producto
+    form_class = cambiarProducto
+    template_name = 'tienda/editar.html'
+    success_url = reverse_lazy('productos')
+
+    def test_func(self):
+        # Verifica si el usuario actual es miembro del staff
+        return self.request.user.is_staff
+    def get_object(self, queryset=None):
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Producto, pk=pk)
+
+
+
+
+class EliminarProductoView(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Producto
+    template_name = 'tienda/confirmarEliminar.html'
+    success_url = reverse_lazy('productos')
+
+    def test_func(self):
+        # Verifica si el usuario actual es miembro del staff
+        return self.request.user.is_staff
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        self.object.delete()
+        return redirect(self.success_url)
+
+
+
+
+class AñadirProducto(LoginRequiredMixin,UserPassesTestMixin,CreateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    template_name = 'tienda/nuevo.html'
+    form_class = cambiarProducto
+    success_url = reverse_lazy('productos')
+
+    def test_func(self):
+        # Verifica si el usuario actual es miembro del staff
+        return self.request.user.is_staff
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
+# --------------------------------------------------------------------------------------------------
+class ProductoXLista( FilterView):
+    template_name = 'tienda/tienda.html'
+    filterset_class = ProductoXmarcaFilter
+    context_object_name = 'Productos'
+
+
+
+
+class comprarProductCreateView(CreateView):
+    model = Compra
+    template_name = 'tienda/compraProducto.html'
+    form_class = comprasForm
+    second_form_class = ValorarProductoForm
+    third_form_class =formComentarios
+
+    def get_success_url(self):
+        return f'/tienda/info/checkout/{self.object.pk}/'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs['pk']
+        producto = get_object_or_404(Producto, pk=pk)
+
+        context['producto'] = producto
+        context['valoracion'] = self.second_form_class()
+        context['comentariosMostrar'] = Comentario.objects.all()
+        context['comt'] = self.third_form_class(self.request.GET)
+        return context
+
+    @transaction.atomic
+    def form_valid(self, form):
+        pk = self.kwargs['pk']
+        producto = get_object_or_404(Producto, pk=pk)
+        valoracion = self.second_form_class(self.request.POST)
+        unidades = form.cleaned_data['unidades']
+
+        if valoracion.is_valid():
+            puntaje = valoracion.cleaned_data['puntaje_valoracion']
+
+        if unidades <= producto.unidades:
+            cliente = Cliente.objects.get(user=self.request.user)
+            producto.unidades -= unidades
+
+            if producto.puntaje_valoracion is not None and puntaje is not None:
+                producto.puntaje_valoracion += puntaje
+
+            producto.save()
+
+            compra = Compra()
+            compra.producto = producto
+            compra.user = cliente
+            compra.unidades = unidades
+            compra.importe = unidades * producto.precio
+            compra.fecha = timezone.now()
+            compra.save()
+
+            cliente.saldo -= compra.importe
+            cliente.save()
+
+            return super().form_valid(form)
+
+
+
+
+
+
+
+class CheckoutDetailView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Compra
+    template_name = 'tienda/checkout.html'
+    context_object_name = 'compra'
+
+
+    def test_func(self):
+        # Verifica si el usuario actual es un cliente
+        return cliente_check(self.request.user)
+
+    def get_object(self, queryset=None):
+        return Compra.objects.get(pk=self.kwargs['pk'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        compra = self.object
+        producto = compra.producto
+        importe = compra.unidades * producto.precio
+        context['producto'] = producto
+        context['importe'] = importe
+        return context
+
+
+
+
+
+
+
+
+class EnviarComentario(LoginRequiredMixin,UserPassesTestMixin,CreateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    form_class = formComentarios
+    template_name = 'tienda/compraProducto.html'
+
+    def test_func(self):
+        # Verifica si el usuario actual es un cliente
+        return cliente_check(self.request.user)
+    def form_valid(self, form):
+        pk = self.kwargs['pk']  # Obtiene el 'pk' de los argumentos de la URL
+        product = get_object_or_404(Producto, pk=pk)
+        comentarioUsuario = form.cleaned_data['texto']
+        cliente = Cliente.objects.get(user=self.request.user)
+
+        nuevo_comentario = Comentario(producto=product, user=cliente, texto=comentarioUsuario)
+        nuevo_comentario.save()
+        return redirect('comprarProducto', pk=pk)
+
+    def get_success_url(self):
+        pk = self.kwargs['pk']  # Obtiene el 'pk' de los argumentos de la URL
+        return reverse_lazy('comprarProducto', kwargs={'pk': pk})
+
+
+class editarComentariosUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Comentario
+    form_class = formComentarios
+    template_name = 'tienda/editar_comentarios.html'
+    context_object_name = 'comentario'
+
+    def test_func(self):
+        # Verifica si el usuario actual es un cliente
+        return cliente_check(self.request.user)
+
+    def get_success_url(self):
+        return reverse_lazy('comprarProducto', kwargs={'pk': self.object.producto.pk})
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        return response
+
+
+
+
+
+class EliminarComentarioView(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    model = Comentario
+    template_name = 'tienda/eliminarComentario.html'  # Reemplaza con la plantilla adecuada
+    context_object_name = 'comentario'
+
+
+    def test_func(self):
+        # Verifica si el usuario actual es un moderador
+        return es_moderador(self.request.user)
+
+    def get_success_url(self):
+        # Obtener el ID del producto antes de eliminar el comentario
+        producto_id = self.object.producto.id
+        return reverse_lazy('comprarProducto', kwargs={'pk': producto_id})
+
+    def delete(self, request, *args, **kwargs):
+        # Obtener el ID del producto antes de eliminar el comentario
+        producto_id = self.get_object().producto.id
+        response = super().delete(request, *args, **kwargs)
+        return redirect('comprarProducto', pk=producto_id)
+
+
+# --------------------------------------------------------------------------------------------------
+
+
+
+class ProductoXmarcaView(FilterView):
+    template_name = 'tienda/info.html'  # Reemplaza 'tu_template.html' con la ruta correcta a tu template
+    filterset_class = ProductoXmarcaFilter
+    context_object_name = 'productos'
+
 
 
 # Mostrara los productos más vendidos en la tienda
-@login_required(login_url='loge_ins')
-@staff_member_required
-def producto_top(request):
-    producto_top = Producto.objects.annotate(sum_unidades=Sum('compra__unidades'),
-                                             sum_importes=Sum('compra__importe')).order_by('-sum_unidades')[
-                   :10]  # annotate() se utiliza para realizar operaciones de agregación en los objetos
-    return render(request, 'tienda/info.html', {'producto_top': producto_top})
+class productosTopClass(ListView):
+    model = Producto
+    template_name = 'tienda/info.html'
+    context_object_name = 'producto_top'
+
+    def get_queryset(self):
+        return Producto.objects.annotate(sum_unidades=Sum('compra__unidades'),sum_importes=Sum('compra__importe')).order_by('-sum_unidades')[:10]  # annotate() se utiliza para realizar operaciones de agregación en los objetos
 
 
-@login_required(login_url='loge_ins')
-@staff_member_required
-def historial_compras(request):
-    compras = Compra.objects.all().annotate(Count('fecha', distinct=True)).order_by('-fecha')
-    return render(request, 'tienda/info.html', {'compras': compras})
+
+#Muestra el historial de las compras de todos los usuarios
+class historiaCompraClass(ListView):
+    model = Compra
+    template_name = 'tienda/info.html'
+    context_object_name = 'compras'
+
+    def get_queryset(self):
+        return Compra.objects.all().annotate(Count('fecha', distinct=True)).order_by('-fecha')[:10]
 
 
-@login_required(login_url='loge_ins')
-@staff_member_required
-def clientesTop(request):
-    top_cliente = Cliente.objects.annotate(dinero_gastado=Sum('compra__importe')).order_by('-dinero_gastado')[:3]
-    return render(request, 'tienda/info.html', {'top_clientes': top_cliente})
+#Muestra los clientes que más han gastado
+class ClientesTopListView(ListView):
+    model = Cliente
+    template_name = 'tienda/info.html'
+    context_object_name = 'top_clientes'
+
+    def get_queryset(self):
+        return Cliente.objects.annotate(dinero_gastado=Sum('compra__importe')).order_by('-dinero_gastado')[:3]
+
+
+
+
+
+#-------------------------------------------------------
+# class AgregarAlCarritoView(CreateView):
+#     template_name = 'agregar_al_carrito.html'
+#     form_class = AgregarAlCarritoForm
+#     success_url = reverse_lazy('ver_carrito')
+#
+#     def form_valid(self, form):
+#         cantidad = form.cleaned_data['cantidad']
+#         producto_id = self.kwargs['producto_id']
+#         producto = Producto.objects.get(id=producto_id)
+#
+#
+#             carrito = self.request.carrito
+#
+#             carrito.productos.add(producto, through_defaults={'cantidad': cantidad})
+#
+#         return super().form_valid(form)
+#
+# class VerCarritoView(ListView):
+#     template_name = 'ver_carrito.html'
+#     model = ItemCarrito
+#     context_object_name = 'items'
+#
+#     def get_queryset(self):
+#         if self.request.user.is_authenticated:
+#             carrito = self.request.carrito
+#             return carrito.productos.all()
+
+
+
+# class ComprarCarritoView(CreateView):
+#     template_name = 'comprar_carrito.html'
+#     form_class = ComprarCarritoForm  # Asegúrate de tener un formulario apropiado
+#     success_url = reverse_lazy('pagina_de_exito_compra')  # Cambia esto con la URL deseada después de la compra
+#
+#     def form_valid(self, form):
+#         if self.request.user.is_authenticated:
+#             carrito = self.request.carrito
+#
+#             # Itera sobre los productos en el carrito y realiza la compra para cada uno
+#             for producto in carrito.productos.all():
+#                 Compra.objects.create(
+#                     carrito=carrito,
+#                     producto=producto,
+#                     unidades=producto.unidades,
+#                     importe=producto.precio * producto.unidades,
+#                     iva=producto.precio * producto.unidades * 0.21
+#                 )
+#
+#             # Limpia el carrito después de la compra
+#             carrito.productos.clear()
+#
+#         return super().form_valid(form)

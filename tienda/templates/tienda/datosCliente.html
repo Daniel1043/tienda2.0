@@ -1,0 +1,21 @@
+{% extends 'tienda/base.html' %}
+   {% block content %}
+      <center> <h1>Datos cliente</h1> </center>
+
+        <div class="recuadro_datosCliente">
+
+
+
+          <div class="texto_datosCliente">Nombre: {{ cliente_actual.user.username  }}</div>
+
+            <div class="texto_datosCliente">Apellido: {{ cliente_actual.apellidos }}</div>
+
+              <div class="texto_datosCliente">Saldo: {{ cliente_actual.saldo }}</div>
+
+
+            <br>
+            <center> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarPerfil'  %}">Editar perfil</a> </button></center>
+            <center> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'datosDireccion'  %}">Ver info</a> </button></center>
+
+        </div>
+ {% endblock %}

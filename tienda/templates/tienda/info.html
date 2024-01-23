@@ -1,25 +1,24 @@
 {% extends 'tienda/base.html' %}
 
 {% block content %}
-	<div class="titulo_tienda">Información</div>
-	<ul>
+    <div class="titulo_tienda">Información</div>
+    <ul>
 
-       
+
             <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'producto_top'  %}">Productos top</a></button>
             <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'clientesTop'  %}">Mejores clientes</a></button>
             <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'historial_compras'  %}">Historial de compras</a></button>
             <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'info'  %}">Todos los productos</a></button>
 
 
-	</ul>
+    </ul>
     <br>
+    <form method="get">
+       <div class="checkbox-container"> {{ filter.form }}</div>
+        <input type="submit"  value="Buscar" class="myButton"/>
+    </form>
+ {% if productos %}
 
- {% if Productos %}
-        <form method="post">
-            {% csrf_token %}
-           <div class="checkbox-container"> {{ filtro_prod.as_div }}</div>
-            <button type="active" class="myButton">Buscar</button>
-        </form>
 
 
        <table border="1" class="tablaOrden"  cellspacing="1"  >
@@ -33,7 +32,7 @@
                             </tr>
 
 
-                         {% for producto in Productos %}
+                         {% for producto in productos %}
 
                              <tr>
 
@@ -115,7 +114,7 @@
                                 <td class="texto"> Total gastado </td>
                                 <td class="texto"> Unidades compradas</td>
                                 <td class="texto"> Fecha de compra</td>
-                                <td class="texto"> Cliente </td>
+
                             </tr>
 
 
@@ -129,8 +128,6 @@
                                 <td class="texto"> {{compra.importe}}€</td>
                                 <td class="texto"> {{compra.unidades}}</td>
                                  <td class="texto"> {{compra.fecha  }}</td>
-                                 <td class="texto" > {{compra.user.username }}</td>
-
 
 
 
@@ -143,5 +140,5 @@
 
                        </table>
     {% endif %}
-    
+
 {% endblock %}

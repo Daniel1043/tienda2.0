@@ -1,0 +1,30 @@
+{% extends 'tienda/base.html' %}
+            		
+{% block content %}
+
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% if form.envio %}
+            <center> <h1>Editar dirección</h1> </center> 
+            <div class="recuadro_editar">
+                <div class="texto_edicion">Envío: {{ form.envio }}</div>
+                <div class="texto_edicion">Facturación: {{ form.facturacion }}</div>
+                <br>
+                <center> <button type="submit" class="button-30">Guardar Cambios</button> </center>
+            </div>
+        {% else %}
+            <center> <h1>Editar tarjeta</h1> </center> 
+            <div class="recuadro_editar">
+                <div class="texto_edicion">Nombre: {{ form.nombre_ID }}</div>
+                <div class="texto_edicion">Tipo: {{ form.tipo }}</div>
+                <div class="texto_edicion">Titular: {{ form.titular }}</div>
+                <div class="texto_edicion">Caducidad: {{ form.Caducidad }}</div>
+                <br>
+                <center> <button type="submit" class="button-30">Guardar Cambios</button> </center>
+            </div>
+        {% endif %}
+    </form>
+    
+{% endblock %}

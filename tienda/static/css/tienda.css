@@ -209,6 +209,15 @@ h1{
   font-size: 30px;
 }
 
+.texto_entrada_enlaces_comentarios{
+  text-decoration: none;
+  color:#1b1b1b;
+  font-size: 30px;
+  text-align:center;
+  margin-top: 30%;
+}
+
+
 /*----iniciarsesion-----*/
 
 .texto_iniciarSesion{
@@ -232,6 +241,81 @@ h1{
   margin-left: 550px;
 
 }
+
+
+/*----crearCliente-----*/
+
+.texto_crearCliente{
+  margin-top: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+  width: 400px;
+  margin-left: 150px;
+
+}
+
+.recuadro_crearCliente{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 120%;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
+}
+
+
+
+/*----datosClientes-----*/
+
+.texto_datosCliente{
+  margin-top: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+  width: 400px;
+  margin-left: 150px;
+
+}
+
+.texto_datosClienteEditar{
+  margin-top: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+  width: 400px;
+
+}
+
+
+.recuadro_datosCliente{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 40%;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
+}
+
+.recuadro_datosEditarCliente{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 1300px;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
+}
+
+
 
 /*------producto--------*/
 
@@ -438,4 +522,45 @@ flex-direction: row;
 /*----info-----*/
 .checkbox-container {
   font-size: 25px;
+}
+
+
+/*----datosClientes-----*/
+
+.texto_comentarios{
+  margin-top: 10px;
+  padding: 5px;
+  text-align: center;
+  font-size: 20px;
+  width: 400px;
+  margin-left: 150px;
+
+}
+
+
+
+
+.recuadro_comentarios{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 50%;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
+}
+
+
+.recuadro_comentarios_textos{
+  border: 1px solid;
+  border-radius: 10px;
+  box-shadow: 4px 2px 2px black;
+  height: 50%;
+  width: 40%;
+  padding: 20px;
+  margin-top: 20px;
+  margin-left: 550px;
+
 }

@@ -22,16 +22,18 @@
             {% endif %}
 
             
-                {% if request.user.is_staff %}
+                {% if not request.user.is_staff and request.user.is_authenticated %}
 
-                {% elif  request.user.is_authenticated  %}
-                    <center> 
+                    <center>
                         <form method="post">
                             {% csrf_token %}
+                             <div class="texto_comprar"> Valorar Producto: {{ valoracion.puntaje_valoracion }}  </div>
+
                             <div class="texto_comprar"> Unidades a comprar: {{ form.unidades }}  <button type="submit"  class="button-30">Comprar</button></div>
-                             
+
                         </form>
                     </center>
+
                 {% endif %}
 
                 {% if messages %}
@@ -41,8 +43,51 @@
                     {% endfor %}
                 </ul>
                 {% endif %}
-          
+
         </div>
+
+
+
     </div>
-    
+
+    {% if not request.user.is_staff and request.user.is_authenticated %}
+
+
+            <div class="recuadro_comentarios">
+
+                <form method="post" action="{% url 'enviar_comentario' producto.pk %}">  <!-- Ajusta el 'action' para apuntar al URL correcto -->
+                    {% csrf_token %}
+                    <div class="texto_comentarios">
+                        Comentario: {{ comt.texto }}
+                        <button type="submit" class="button-30">Enviar</button>
+                    </div>
+                </form>
+            </div>
+
+
+
+    {% endif %}
+
+    {% for comentario in comentariosMostrar %}
+    <div class="recuadro_comentarios_textos">
+        <div class="texto_comentarios"> Escritos: {{ comentario.user }}  </div>
+        <div class="texto_comentarios"> {{ comentario.texto }}  </div>
+
+                    {% if user|stringformat:"s" == comentario.user|stringformat:"s" %} <!--Transforma ambos valores en texto-->
+                        <div class="texto_entrada_enlaces_comentarios"> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editar_comentario' pk=comentario.pk %}">Editar comentario</a> </button></div>
+                        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarComentario' pk=comentario.pk %}">Eliminar comentario</a> </button>
+                    {% endif %}
+
+
+                {% for group in user.groups.all %}
+                    {% if group.name == 'Moderadores' %}
+
+                            <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editar_comentario' pk=comentario.pk %}">Editar comentario</a> </button>
+                            <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarComentario' pk=comentario.pk %}">Eliminar comentario</a> </button>
+
+                    {% endif %}
+                {% endfor %}
+    </div>
+    {% endfor %}
+
 {% endblock %}

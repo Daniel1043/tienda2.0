@@ -28,7 +28,7 @@
                                         <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarProducto' pk=producto.pk  %}">Editar</a></button>
                                     </td>
                                 
-                                    <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'paginaConfirmacionEliminar' pk=producto.pk %}">Eliminar producto</a> </button></td>
+                                    <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarProducto' pk=producto.pk %}">Eliminar producto</a> </button></td>
                                          
                              </tr>
                          {% endfor %}

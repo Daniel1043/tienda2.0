@@ -1,0 +1,141 @@
+<!-- tu_template.html -->
+
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+      <ul>
+
+            
+        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'datosDireccion'  %}">Direcciones </a></button>
+        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'datosTarjeta'  %}">Tarjetas</a></button>
+        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'datosCompras'  %}">Historial de mis compras</a></button>
+
+
+      </ul>
+      
+  {% if datos_cliente %}
+       
+  <div class="titulo_tienda">Direcciones</div>
+
+       <table border="1" class="tablaOrden"  cellspacing="1"  >
+
+                            <tr class="colorTrEntrada">
+                                <td class="texto"> envio</td>
+                                <td class="texto"> facturacion</td>
+                                <td class="texto"> </td>
+                                <td class="texto"> </td>
+                            </tr>
+
+
+                         {% for direccion in datos_cliente %}
+
+                             <tr>
+
+                                <td class="texto" > {{direccion.envio}}</td>
+                                <td class="texto">{{direccion.facturacion}}</td>
+                                 
+                                
+                                   
+                                <td>  
+                                    <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarDireccion' pk=direccion.pk  %}">Editar</a></button>
+                                </td>
+                                <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarDireccion' pk=direccion.pk %}">Eliminar</a> </button></td>
+
+
+                             </tr>
+                         {% endfor %}
+
+                       </table>
+                       <br>
+              <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'nuevaDireccion' %}">Añadir direccion</a> </button>
+
+
+
+    {% endif %}
+
+
+        {% if not datos_cliente and not datos_cliente_tarjeta %}
+          {% if not comprasActualCliente %}
+                      <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'nuevaDireccion' %}">Añadir direccion</a> </button>
+                                <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'nuevaTarjeta' %}">Añadir tarjeta</a> </button>
+
+            {% endif %}
+    {% endif %}
+
+
+
+    {% if datos_cliente_tarjeta %}
+
+    <div class="titulo_tienda">Tarjetas</div>
+
+         <table border="1" class="tablaOrden"  cellspacing="1"  >
+
+                              <tr class="colorTrEntrada">
+                                  <td class="texto"> nombre_ID</td>
+                                  <td class="texto"> tipo</td>
+                                  <td class="texto"> titular</td>
+                                  <td class="texto"> Caducidad</td>
+                                  <td class="texto"> </td>
+                                  <td class="texto"> </td>
+
+                              </tr>
+
+
+                           {% for tarjeta in datos_cliente_tarjeta %}
+
+                               <tr>
+
+                                  <td class="texto" > {{tarjeta.nombre_ID}}</td>
+                                  <td class="texto">{{tarjeta.tipo}}</td>
+                                  <td class="texto" > {{tarjeta.titular}}</td>
+                                  <td class="texto">{{tarjeta.Caducidad}}</td>
+
+                                  <td>
+                                    <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarTarjeta' pk=tarjeta.pk  %}">Editar</a></button>
+                                </td>
+
+                                <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarTarjeta' pk=tarjeta.pk %}">Eliminar</a> </button></td>
+
+                               </tr>
+                           {% endfor %}
+
+                         </table>
+                         <br>
+        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'nuevaTarjeta' %}">Añadir tarjeta</a> </button>
+      {% endif %}
+
+
+
+
+
+
+                    {% if comprasActualCliente %}
+
+                            <table border="1" class="tablaOrden"  cellspacing="1"  >
+
+                                <tr class="colorTrEntrada">
+                                    <td class="texto"> Fecha</td>
+                                    <td class="texto"> Unidades</td>
+                                    <td class="texto">Importe</td>
+                                    <td class="texto"> IVA</td>
+                                </tr>
+
+
+                            {% for compra in comprasActualCliente %}
+
+                                    <tr>
+                                        <td class="texto" > {{compra.fecha}}</td>
+                                        <td class="texto">{{compra.unidades}}</td>
+                                        <td class="texto"> {{compra.importe}}€</td>
+                                        <td class="texto"> {{compra.iva}}</td>
+                                    </tr>
+
+
+
+                            {% endfor %}
+
+                        </table>
+            {% endif %}
+    
+{% endblock %}
