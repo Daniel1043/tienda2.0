@@ -1,16 +1,18 @@
 {% extends 'tienda/base.html' %}
+{% load i18n %}
+
             			{% block content %}
 
                         <table border="1" class="tablaOrden"  cellspacing="1"  >
 
                             <tr class="colorTrEntrada">
-                                <td class="texto"> Nombre</td>
-                                <td class="texto"> Marca</td>
-                                <td class="texto">Modelo</td>
-                                <td class="texto"> Precio </td>
-                                <td class="texto"> Unidades</td>
-                                <td class="texto"> Editar</td>
-                                <td class="texto"> Eliminar</td>
+                                 <td class="texto">{% trans "Nombre" %}</td>
+                                <td class="texto">{% trans "Marca" %}</td>
+                                <td class="texto">{% trans "Modelo" %}</td>
+                                <td class="texto">{% trans "Precio" %}</td>
+                                <td class="texto">{% trans "Unidades" %}</td>
+                                <td class="texto">{% trans "Editar" %}</td>
+                                <td class="texto">{% trans "Eliminar" %}</td>
                             </tr>
                             
 
@@ -25,17 +27,17 @@
                                 <td class="texto"> {{producto.unidades}}</td>
 
                                     <td>  
-                                        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarProducto' pk=producto.pk  %}">Editar</a></button>
+                                        <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'editarProducto' pk=producto.pk  %}">{% trans "Editar" %}</a></button>
                                     </td>
                                 
-                                    <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarProducto' pk=producto.pk %}">Eliminar producto</a> </button></td>
+                                    <td> <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'eliminarProducto' pk=producto.pk %}">{% trans "Eliminar" %}</a> </button></td>
                                          
                              </tr>
                          {% endfor %}
 
                        </table>
                        <br>
-                       <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'añadirProducto' %}">Añadir producto</a> </button>
+                       <button type="action" class="button-30"><a  class="texto_entrada_enlaces" href="{% url 'añadirProducto' %}">{% trans "Añadirproducto" %}</a> </button>
 
                         {% endblock %}
            

@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django_filters.views import FilterView
 
 from .filters import ProductoXmarcaFilter
-from .models import Producto, Cliente, Compra, Comentario, Direccion, Tarjeta
+from .models import Producto, Cliente, Compra, Comentario, Direccion, Tarjeta, Valoracion
 from django.contrib.admin.views.decorators import staff_member_required
 from .form import cambiarProducto, iniciar_sesion, fitroForm, comprasForm,crearUsuario,crearUsuarioDatos, \
     ValorarProductoForm, formComentarios,crearDireccionForm,crearTarjetaForm
@@ -114,7 +114,7 @@ class clientenUpdateview(UpdateView):
     model = Cliente
     form_class = crearUsuarioDatos
     second_form_class = crearUsuario
-    success_url = reverse_lazy('welcome')
+    success_url = reverse_lazy('loge_ins')
 
     def get_object(self, queryset=None):
         # Obtener el objeto Cliente asociado al usuario actual
@@ -153,6 +153,8 @@ class tarjetasListview(LoginRequiredMixin, UserPassesTestMixin, ListView):
         cliente_actual = Cliente.objects.get(user=self.request.user)
 
         return Tarjeta.objects.filter(user=cliente_actual).all()
+
+
 
 
 class tarjetaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -376,10 +378,6 @@ class comprarProductCreateView(CreateView):
     form_class = comprasForm
     second_form_class = ValorarProductoForm
     third_form_class =formComentarios
-
-    def get_success_url(self):
-        return f'/tienda/info/checkout/{self.object.pk}/'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs['pk']
@@ -387,7 +385,8 @@ class comprarProductCreateView(CreateView):
 
         context['producto'] = producto
         context['valoracion'] = self.second_form_class()
-        context['comentariosMostrar'] = Comentario.objects.all()
+        context['comentariosMostrar'] = Comentario.objects.all()[:10]
+        context['producto_valoracionMed'] = Valoracion.objects.filter(producto=producto).aggregate(media_total=Avg('puntaje_valoracion'))
         context['comt'] = self.third_form_class(self.request.GET)
         return context
 
@@ -395,36 +394,26 @@ class comprarProductCreateView(CreateView):
     def form_valid(self, form):
         pk = self.kwargs['pk']
         producto = get_object_or_404(Producto, pk=pk)
-        valoracion = self.second_form_class(self.request.POST)
         unidades = form.cleaned_data['unidades']
 
-        if valoracion.is_valid():
-            puntaje = valoracion.cleaned_data['puntaje_valoracion']
-
         if unidades <= producto.unidades:
-            cliente = Cliente.objects.get(user=self.request.user)
-            producto.unidades -= unidades
+                cliente = Cliente.objects.get(user=self.request.user)
+                producto.unidades -= unidades
 
-            if producto.puntaje_valoracion is not None and puntaje is not None:
-                producto.puntaje_valoracion += puntaje
+                producto.save()
 
-            producto.save()
+                compra = Compra()
+                compra.producto = producto
+                compra.user = cliente
+                compra.unidades = unidades
+                compra.importe = unidades * producto.precio
+                compra.fecha = timezone.now()
+                compra.save()
 
-            compra = Compra()
-            compra.producto = producto
-            compra.user = cliente
-            compra.unidades = unidades
-            compra.importe = unidades * producto.precio
-            compra.fecha = timezone.now()
-            compra.save()
+                cliente.saldo -= compra.importe
+                cliente.save()
 
-            cliente.saldo -= compra.importe
-            cliente.save()
-
-            return super().form_valid(form)
-
-
-
+                return redirect('checkout', pk=compra.pk)
 
 
 
@@ -454,8 +443,33 @@ class CheckoutDetailView(LoginRequiredMixin,UserPassesTestMixin,DetailView):
         return context
 
 
+# -----------------------------------------------------------------------------------------------------------------------------
+
+class EnviarValoracion(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    login_url = "/tienda/tienda/iniciar/"
+    redirect_field_name = "tienda/iniciarSesion.html"
+    form_class = ValorarProductoForm
+    template_name = 'tienda/compraProducto.html'
+
+    def test_func(self):
+        # Verifica si el usuario actual es un cliente
+        return cliente_check(self.request.user)
+
+    def form_valid(self, form):
+        pk = self.kwargs['pk']
+        producto = get_object_or_404(Producto, pk=pk)
+        cliente = Cliente.objects.get(user=self.request.user)
+
+        form.instance.producto = producto
+        form.instance.user = cliente
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('comprarProducto', kwargs={'pk': self.kwargs['pk']})
 
 
+# -----------------------------------------------------------------------------------------------------------------------------
 
 
 

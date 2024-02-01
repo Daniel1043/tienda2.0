@@ -1,6 +1,6 @@
 from django import forms
 from datetime import datetime
-from .models import Producto,Compra,Marca,Cliente,Comentario,Direccion,Tarjeta
+from .models import Producto,Compra,Marca,Cliente,Comentario,Direccion,Tarjeta,Valoracion
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
@@ -43,7 +43,7 @@ class iniciar_sesion(AuthenticationForm):
 
 class ValorarProductoForm(forms.ModelForm):
     class Meta:
-        model = Producto
+        model = Valoracion
         fields = ['puntaje_valoracion']
 
 

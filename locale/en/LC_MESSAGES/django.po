@@ -30,6 +30,65 @@ msgstr "English"
 msgid "Tienda Virtual"
 msgstr "Virtual Shop"
 
-#: main/templates/main/index.html:5
+#: tienda/templates/index.html:5
 msgid "Aquí empieza todo"
 msgstr "Here is where all starts..."
+
+#: tienda/template/tienda.html:4
+#: tienda/templates/producto.html:8
+msgid "Marca"
+msgstr "Brand"
+
+#: tienda/template/tienda.html:4
+#: tienda/templates/producto.html:9
+msgid "Nombre"
+msgstr "Name"
+
+#: tienda/template/tienda.html:8
+msgid "Comprar"
+msgstr "Buy"
+
+
+#: tienda/templates/producto.html:10
+msgid "Modelo"
+msgstr "Model"
+
+#: tienda/templates/producto.html:11
+msgid "Precio"
+msgstr "Price"
+
+#: tienda/templates/producto.html:12
+msgid "Unidades"
+msgstr "Units"
+
+#: tienda/templates/producto.html:13
+msgid "Editar"
+msgstr "Edit"
+
+#: tienda/templates/producto.html:14
+msgid "Eliminar"
+msgstr "Delete"
+
+
+#: tienda/templates/producto.html:18
+msgid "Añadirproducto"
+msgstr "Add product"
+
+
+
+
+#: tienda/templates/checkout.html:18
+msgid "preciProducto"
+msgstr "Price product"
+
+#: tienda/templates/producto.html:18
+msgid "unidadesCompradas"
+msgstr "units purchased"
+
+#: tienda/templates/producto.html:18
+msgid "preciFinal"
+msgstr "Final price"
+
+#: tienda/templates/producto.html:18
+msgid "finCompra"
+msgstr "Thank you"

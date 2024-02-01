@@ -25,9 +25,6 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=30)
     marca = models.ForeignKey(Marca,
                               on_delete=models.CASCADE)  # Establece una relación con otro modelo en este caso Marca
-    puntaje_valoracion = models.DecimalField(max_digits=3, decimal_places=1,
-                                             validators=[MinValueValidator(limit_value=0),
-                                                         MaxValueValidator(limit_value=10)], null=True, blank=True)
 
     def __str__(self):  # Define cómo se representará el objeto Producto como una cadena
         return f'{self.marca} {self.modelo}'  # Devuelve una cadena que combina el nombre de la marca y el modelo del producto
@@ -107,3 +104,35 @@ class Comentario(models.Model):
 
     class Meta:
         verbose_name_plural = "Comentarios"
+
+
+class Valoracion(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    user = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    puntaje_valoracion = models.DecimalField(max_digits=3, decimal_places=1,
+                                             validators=[MinValueValidator(limit_value=0),
+                                                         MaxValueValidator(limit_value=10)], null=True, blank=True)
+    def __str__(self):
+        return f'{self.user.user.username}{self.puntaje_valoracion}'
+    class Meta:
+        verbose_name_plural = "Valoraciones"
+
+#RECIBIMOS PRODUCTO Y UNIDADES AL AGREGAR UN PRODUCTO AL CARRITO, NO SE LE AÑADE COMPRA, NO  SE CREA UN MODELO, ES COMO UN MODELO FANTASMA
+#SERIALIZAMOS, SELF.REQUEST.SESSION[]
+
+# class Carrito(models.Model):
+#     compra = models.ForeignKey(Compra, on_delete=models.CASCADE)
+#     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+#     unidades = models.PositiveIntegerField(default=1, validators=[MinValueValidator(limit_value=1)])
+#     precio =
+#     fecha_creacion = models.DateTimeField(default=timezone.now)
+#
+#     def __str__(self):
+#         return f'{self.user.username} - {self.producto.nombre} ({self.cantidad} unidades)'
+
+
+#compra pasos
+#-save COMPRA
+#-save Items_compra
+#-save usuario (saldo)
+#si hay un error un rollback

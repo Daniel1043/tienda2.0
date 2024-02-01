@@ -1,4 +1,5 @@
 {% extends 'tienda/base.html' %}
+{% load i18n %}
 
 {% block content %}
 
@@ -6,13 +7,13 @@
         <div class="recuadro_compraFin">
             <div class="texto_compra_Fin">
                 <div class="fechaCompra"> {{ compra.fecha }} </div>
-                <div class="texto_compra_fin">Precio del producto {{ producto.precio }}€  </div>
-                <div class="texto_compra_fin">Unidades compradas {{ compra.unidades }} </div>
-                <div class="texto_compra_fin">Precio Final {{ importe }}€ </div>
+                <div class="texto_compra_fin"> {% trans "preciProducto" %} {{ producto.precio }}€  </div>
+                <div class="texto_compra_fin">{% trans "unidadesCompradas" %} {{ compra.unidades }} </div>
+                <div class="texto_compra_fin">{% trans "preciFinal" %} {{ importe }}€ </div>
 
             </div>
         </div>
-    <h2>Gracias por su compra</h2>
+    <h2>{% trans "finCompra" %}</h2>
 
 
 

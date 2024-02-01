@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import clientenUpdateview,historiaCompraClienteListview,tarjetaDeleteview,tarjetaUpdateview,tarjetaCreateView,direccionDeleteview,direccionUpdateview,direccionCreateView,tarjetasListview,direccionesListview,crearCliente, EliminarComentarioView, editarComentariosUpdateView, CheckoutDetailView,infoClienteDetail,ClientesTopListView,historiaCompraClass,productosTopClass,CheckoutDetailView,editarComentariosUpdateView,EliminarComentarioView,comprarProductCreateView, ProductoXLista, EliminarProductoView, EditarProductoView, ProductListView, ProductoXmarcaView, historiaCompraClass, productosTopClass, AboutView, LogIn,LogoutViewCl, AñadirProducto, EnviarComentario, ClientesTopListView
+from .views import EnviarValoracion,clientenUpdateview,historiaCompraClienteListview,tarjetaDeleteview,tarjetaUpdateview,tarjetaCreateView,direccionDeleteview,direccionUpdateview,direccionCreateView,tarjetasListview,direccionesListview,crearCliente, EliminarComentarioView, editarComentariosUpdateView, CheckoutDetailView,infoClienteDetail,ClientesTopListView,historiaCompraClass,productosTopClass,CheckoutDetailView,editarComentariosUpdateView,EliminarComentarioView,comprarProductCreateView, ProductoXLista, EliminarProductoView, EditarProductoView, ProductListView, ProductoXmarcaView, historiaCompraClass, productosTopClass, AboutView, LogIn,LogoutViewCl, AñadirProducto, EnviarComentario, ClientesTopListView
 from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('', AboutView.as_view(), name='welcome'),
@@ -41,4 +41,6 @@ urlpatterns = [
     path('tienda/info/enviarComentar/<int:pk>', EnviarComentario.as_view(), name='enviar_comentario'),
     path('tienda/info/editarcomentario/<int:pk>', editarComentariosUpdateView.as_view(), name='editar_comentario'),
     path('tienda/info/eliminarComentario/<int:pk>', EliminarComentarioView.as_view(), name='eliminarComentario'),
+
+    path('tienda/info/enviarValoracion/<int:pk>', EnviarValoracion.as_view(), name='enviar_valoracion'),
 ]

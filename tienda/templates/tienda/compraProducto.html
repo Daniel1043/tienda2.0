@@ -27,7 +27,6 @@
                     <center>
                         <form method="post">
                             {% csrf_token %}
-                             <div class="texto_comprar"> Valorar Producto: {{ valoracion.puntaje_valoracion }}  </div>
 
                             <div class="texto_comprar"> Unidades a comprar: {{ form.unidades }}  <button type="submit"  class="button-30">Comprar</button></div>
 
@@ -51,6 +50,24 @@
     </div>
 
     {% if not request.user.is_staff and request.user.is_authenticated %}
+        <div class="recuadro_comentarios">
+
+            <div class="texto_comentarios">
+                {% if producto_valoracionMed %}
+        Valorar Producto:  {{ producto_valoracionMed.media_total|floatformat }}
+                {% else %}
+                    Aún no hay valoraciones para este producto.
+                {% endif %}
+            </div>
+
+        <form method="post" action="{% url 'enviar_valoracion' producto.pk %}">  <!-- Ajusta el 'action' para apuntar al URL correcto -->
+            {% csrf_token %}
+            <div class="texto_comentarios">
+                Valorar Producto: {{ valoracion.puntaje_valoracion }}
+                <button type="submit" class="button-30">Enviar</button>
+            </div>
+        </form>
+    </div>
 
 
             <div class="recuadro_comentarios">
